@@ -3,7 +3,7 @@ name: Run Bot After 31 Minutes
 
 on:
   schedule:
-    - cron: "*/31 * * * *"  # Chạy mỗi 31 phút
+    - cron: "*/31 * * * *"  # Chạy mỗi 31 phút ok
 
 jobs:
   run-bot:
