@@ -1,0 +1,28 @@
+name: Keep Codespace Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Chạy mỗi 5 phút
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Cài đặt Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Chọn phiên bản Node.js bạn muốn sử dụng
+
+      # Check out mã nguồn của repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Cài đặt dependencies
+      - name: Install dependencies
+        run: npm install  # Cài đặt các package từ file package.json
+
+      # Chạy bot.js
+      - name: Run the bot
+        run: node bot.js  # Chạy file bot.js của bạn
