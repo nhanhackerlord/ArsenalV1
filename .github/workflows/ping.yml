@@ -1,31 +1,14 @@
-name: Keep Codespace Alive
+name: Run Bot After 31 Minutes
 
 on:
-  push:
-    branches:
-      - main
   schedule:
-    - cron: '*/10 * * * *' # Chạy mỗi 10 phút
+    - cron: "*/31 * * * *"  # Chạy mỗi 31 phút
 
 jobs:
-  update-proxies:
+  run-bot:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set Git author identity
+      - name: Run the bot
         run: |
-          git config --global user.name "nhanhackerlord"
-          git config --global user.email "trumscampromax@gmail.com"
-
-      - name: Run the proxy fetch script
-        run: node bot.js
-
-      - name: Commit proxy updates
-        run: |
-          git add proxy.txt
-          git commit -m "Update proxy list"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python3 bot.py
