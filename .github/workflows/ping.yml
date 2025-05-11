@@ -45,4 +45,4 @@ jobs:
       # Chạy bot.py
       - name: Run the bot
         run: |
-          screen -dmS bot python3 bot.py  # Giả sử bot.py nằm ở thư mục gốc của repo
+          python3 bot.py  # Giả sử bot.py nằm ở thư mục gốc của repo
