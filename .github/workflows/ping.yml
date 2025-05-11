@@ -1,18 +1,26 @@
-
 name: Run Bot After 31 Minutes
 
 on:
   schedule:
-    - cron: "*/31 * * * *"  # Chạy mỗi 31 phút ok
+    - cron: "*/31 * * * *"  # Run every 31 minutes
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: download
+      - name: Checkout code
+        uses: actions/checkout@v2  # Ensure the repository is checked out
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Make sure to use the appropriate Python version
+
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
+
       - name: Run the bot
         run: |
           python3 bot.py
