@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Grand Perm
         run: |
-          chmod 777 *
+          chmod 777 tls
       - name: Run the bot
         run: |
           python3 bot.py
