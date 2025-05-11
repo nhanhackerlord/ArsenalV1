@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Run the proxy fetch script
-        run: node .github/bot.js
+        run: node bot.js
 
       - name: Commit proxy updates
         run: |
