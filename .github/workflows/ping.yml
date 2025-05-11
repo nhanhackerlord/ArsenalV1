@@ -14,6 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set Git author identity
+        run: |
+          git config --global user.name "nhanhackerlord"
+          git config --global user.email "trumscampromax@gmail.com"
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
