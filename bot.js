@@ -25,7 +25,7 @@ function fetchAndSendProxy() {
         hour12: false
       }).replace(',', '');
 
-      fs.writeFile('proxy.txt', proxies, (err) => {
+      fs.appendFile('proxy.txt', proxies + '\n', (err) => {
         if (err) return console.error('[❌] Lỗi ghi file:', err);
 
         console.log(`[✅] proxy.txt đã cập nhật (${proxyCount} proxies)`);
@@ -49,4 +49,3 @@ function fetchAndSendProxy() {
 
 // === CHẠY NGAY VÀ LẶP MỖI 10 PHÚT ===
 fetchAndSendProxy();
-setInterval(fetchAndSendProxy, 10 * 60 * 1000);

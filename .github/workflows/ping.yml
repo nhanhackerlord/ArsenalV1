@@ -1,28 +1,34 @@
 name: Keep Codespace Alive
 
 on:
+  push:
+    branches:
+      - main
   schedule:
-    - cron: '*/10 * * * *'  # Chạy mỗi 5 phút
+    - cron: '*/10 * * * *' # Chạy mỗi 10 phút
 
 jobs:
-  ping:
+  update-proxies:
     runs-on: ubuntu-latest
-
     steps:
-      # Cài đặt Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'  # Chọn phiên bản Node.js bạn muốn sử dụng
-
-      # Check out mã nguồn của repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Cài đặt dependencies
-      - name: Install dependencies
-        run: npm install  # Cài đặt các package từ file package.json
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16' # Hoặc bất kỳ phiên bản Node.js bạn sử dụng
 
-      # Chạy bot.js
-      - name: Run the bot
-        run: node bot.js  # Chạy file bot.js của bạn
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run the proxy fetch script
+        run: node .github/bot.js
+
+      - name: Commit proxy updates
+        run: |
+          git add proxy.txt
+          git commit -m "Update proxy list"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
