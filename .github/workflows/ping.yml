@@ -19,14 +19,6 @@ jobs:
           git config --global user.name "nhanhackerlord"
           git config --global user.email "trumscampromax@gmail.com"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16' # Hoặc bất kỳ phiên bản Node.js bạn sử dụng
-
-      - name: Install dependencies
-        run: npm install
-
       - name: Run the proxy fetch script
         run: node bot.js
 
