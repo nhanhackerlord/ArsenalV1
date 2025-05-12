@@ -161,11 +161,5 @@ def main():
 
     print("Bot is running")
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.create_task(shutdown_after_delay(application, 1800))  # This will stop the bot after 30 minutes
-
-    application.run_polling()
-
 if __name__ == "__main__":
     main()
