@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Cấu hình
 ALLOWED_CHAT_ID = -1002673143239  # ID nhóm được phép sử dụng bot
-ALLOWED_USER_ID = 5622708943      # ID user được phép tấn công không giới hạn
+ALLOWED_USER_ID = [5622708943;5942559129]      # ID user được phép tấn công không giới hạn
 token_input = '7567331917:AAHPY5MjMiWV8_1STW2q5Q7sbzGiAokpbio'  # Token bot
 
 # Trạng thái
@@ -61,10 +61,10 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         url = context.args[0]
-        time = int(context.args[1]) if len(context.args) > 1 else 60
+        time = int(context.args[1]) if len(context.args) > 1 else 90
 
         if time > 60 and update.effective_user.id != ALLOWED_USER_ID:
-            await update.message.reply_text("Bạn chỉ được tấn công tối đa 60 giây.")
+            await update.message.reply_text("Bạn chỉ được tấn công tối đa 90 giây.")
             return
 
         ip = get_ip_from_url(url)
