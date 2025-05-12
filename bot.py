@@ -101,7 +101,7 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"✅ Đã hoàn thành tấn công: {escape_html(url)}")
 
     except IndexError:
-        await update.message.reply_text("Vui lòng nhập đúng cú pháp: /bypass hoặc /flood (url) (time)")
+        await update.message.reply_text("Vui lòng nhập đúng cú pháp: /flood (url) (time)")
 
     except ValueError:
         await update.message.reply_text("Thời gian phải là một số nguyên.")
