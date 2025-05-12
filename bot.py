@@ -130,8 +130,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     help_info = {
-        "/ongoing": "Kiểm tra trạng thái tấn công hiện tại.",
-        "/bypass": "[url] [time] -- Gửi tấn công Bypass.",
+        "/ongoing": "Kiểm tra trạng thái tấn công hiện tại
         "/flood": "[url] [time] -- Gửi tấn công Flood.",
         "/help": "Hiển thị hướng dẫn lệnh."
     }
