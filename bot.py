@@ -61,10 +61,10 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         url = context.args[0]
-        time = int(context.args[1]) if len(context.args) > 1 else 90
+        time = int(context.args[1]) if len(context.args) > 1 else 120
 
-        if time > 60 and update.effective_user.id != ALLOWED_USER_ID:
-            await update.message.reply_text("Bạn chỉ được tấn công tối đa 90 giây.")
+        if time > 120 and update.effective_user.id != ALLOWED_USER_ID:
+            await update.message.reply_text("Bạn chỉ được tấn công tối đa 120 giây.")
             return
 
         ip = get_ip_from_url(url)
